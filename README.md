@@ -31,10 +31,27 @@ Este repositorio contiene un backend en Flask y un frontend en Angular para el r
    docker compose down
    ```
 
+### Migraciones de base de datos
+
+El contenedor del backend ejecuta automáticamente las migraciones de Alembic
+con `alembic upgrade head` antes de iniciar el servidor. Si necesitas
+aplicarlas manualmente (por ejemplo, en un entorno local sin Docker), puedes
+ejecutar:
+
+```bash
+cd backend
+alembic upgrade head
+```
+
 ## Variables de entorno relevantes
 
 - **backend**
   - `FLASK_ENV`: define el entorno de ejecución de Flask (por defecto `production`).
+   - `SQLALCHEMY_DATABASE_URI`: URL completa de conexión a la base de datos. Tiene
+     prioridad sobre el resto de variables.
+   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: parámetros
+     utilizados para construir la cadena de conexión MySQL cuando no se define
+     `SQLALCHEMY_DATABASE_URI`.
 
 - **frontend**
   - `NG_CLI_ANALYTICS`: desactiva la telemetría del CLI de Angular.

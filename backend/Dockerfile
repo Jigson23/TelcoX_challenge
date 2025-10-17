@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "-m", "backend.app"]
+CMD ["sh", "-c", "alembic upgrade head && python -m backend.app"]
