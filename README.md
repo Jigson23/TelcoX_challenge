@@ -1,59 +1,122 @@
 # TelcoX Challenge
 
-Este repositorio contiene un backend en Flask y un frontend en Angular para el reto TelcoX. A continuación se describen los pasos para ejecutar ambos servicios usando contenedores Docker.
+## Descripción general
+La solución TelcoX ofrece un panel de control para consultar el consumo de datos y minutos de clientes de telecomunicaciones. El
+backend expone una API REST construida con Flask que simula la integración con un sistema BSS, mientras que el frontend se
+implementa en Angular para visualizar la información en un dashboard interactivo.
+
+## Arquitectura de la solución
+- **Backend (`/backend`)**: servicio Flask con SQLAlchemy y migraciones Alembic. Expone los endpoints REST y orquesta un cliente
+  BSS simulado que devuelve la información de consumo y perfil de cliente.【F:backend/routes/consumption.py†L1-L48】【F:backend/services/bss_client.py†L1-L74】
+- **Frontend (`/frontend/telcox-dashboard`)**: aplicación Angular 18 que consume la API y utiliza módulos PrimeNG para los
+  componentes UI del panel (tablas, tarjetas, formularios y notificaciones).【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.html†L1-L64】
+- **Comunicación**: ambos servicios se orquestan vía `docker-compose` exponiendo el backend en el puerto 5000 y el frontend en el
+  4200. En local se puede ejecutar cada servicio de forma independiente o dentro de contenedores.【F:docker-compose.yml†L1-L33】
 
 ## Requisitos previos
+### Desarrollo local
+- Python 3.12+ y `pip` para el backend.【F:backend/Dockerfile†L1-L16】
+- Node.js 20+ y npm para el frontend.【F:frontend/Dockerfile†L1-L15】
+- Angular CLI (`npm install -g @angular/cli`) para utilidades de desarrollo opcionales.
 
+### Contenedores
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-## Puesta en marcha con Docker Compose
-
-1. Desde la raíz del proyecto, construye y levanta los servicios en segundo plano:
-
+## Puesta en marcha
+### Con Docker Compose
+1. Construir y levantar los servicios desde la raíz del proyecto:
    ```bash
    docker compose up --build -d
    ```
-
-2. Los contenedores exponen los siguientes puertos:
-   - Backend Flask: [http://localhost:5000](http://localhost:5000)
-   - Frontend Angular: [http://localhost:4200](http://localhost:4200)
-
-3. Para seguir los registros de ambos servicios utiliza:
-
+2. Acceder a los servicios:
+   - Backend Flask: http://localhost:5000
+   - Frontend Angular: http://localhost:4200
+3. Seguir los registros combinados:
    ```bash
    docker compose logs -f
    ```
-
-4. Cuando quieras detener y eliminar los contenedores ejecuta:
-
+4. Detener y limpiar los contenedores:
    ```bash
    docker compose down
    ```
 
-### Migraciones de base de datos
+### Backend Flask en local
+1. Crear y activar un entorno virtual:
+   ```bash
+   cd backend
+   python -m venv .venv
+   source .venv/bin/activate  # En Windows: .venv\\Scripts\\activate
+   ```
+2. Instalar dependencias y preparar la base de datos (SQLite por defecto, configurable vía variables):
+   ```bash
+   pip install -r requirements.txt
+   alembic upgrade head
+   ```
+3. Definir las variables necesarias si se usa una base MySQL externa (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` o
+   `SQLALCHEMY_DATABASE_URI`).【F:backend/app_factory.py†L31-L58】
+4. Ejecutar la aplicación:
+   ```bash
+   FLASK_ENV=development python -m backend.app
+   ```
 
-El contenedor del backend ejecuta automáticamente las migraciones de Alembic
-con `alembic upgrade head` antes de iniciar el servidor. Si necesitas
-aplicarlas manualmente (por ejemplo, en un entorno local sin Docker), puedes
-ejecutar:
+### Frontend Angular en local
+1. Instalar dependencias:
+   ```bash
+   cd frontend/telcox-dashboard
+   npm install
+   ```
+2. Levantar el servidor de desarrollo:
+   ```bash
+   npm start
+   ```
+3. El panel estará disponible en http://localhost:4200 y recargará automáticamente ante cambios.
 
-```bash
-cd backend
-alembic upgrade head
+## Referencia de API
+| Endpoint | Método | Parámetros | Respuesta exitosa |
+| --- | --- | --- | --- |
+| `/api/consumo` | GET | `customer_id` (query string, obligatorio) | Resumen de consumo del cliente: `cliente_id`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L24-L37】【F:backend/services/bss_client.py†L50-L61】 |
+| `/api/cliente` | GET | `customer_id` (query string, obligatorio) | Perfil completo del cliente: `cliente_id`, `nombre`, `saldo`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L40-L52】【F:backend/services/bss_client.py†L63-L73】 |
+
+### Estructura de datos
+Ejemplo de respuesta de `/api/cliente`:
+```json
+{
+  "cliente_id": "0001",
+  "nombre": "Ana Pérez",
+  "saldo": 15.5,
+  "consumo_mb": 1024,
+  "minutos": 120
+}
 ```
+El endpoint `/api/consumo` devuelve un subconjunto del mismo registro con los campos `cliente_id`, `consumo_mb` y `minutos`.
 
-## Variables de entorno relevantes
+### Manejo de errores
+- **400 Bad Request**: falta el parámetro `customer_id` o es inválido.【F:backend/routes/consumption.py†L32-L33】【F:backend/routes/consumption.py†L47-L48】
+- **404 Not Found**: el cliente no existe en el BSS simulado.【F:backend/routes/consumption.py†L36-L37】【F:backend/routes/consumption.py†L51-L52】
+- **504 Gateway Timeout**: el cliente BSS tardó más de lo permitido.【F:backend/routes/consumption.py†L34-L35】【F:backend/routes/consumption.py†L49-L50】
+- **500 Internal Server Error**: errores inesperados o falta de configuración del cliente BSS.【F:backend/routes/consumption.py†L30-L31】【F:backend/routes/consumption.py†L45-L46】【F:backend/app_factory.py†L60-L74】
+Todos los errores se devuelven en formato JSON con la clave `mensaje`.
 
-- **backend**
-  - `FLASK_ENV`: define el entorno de ejecución de Flask (por defecto `production`).
-   - `SQLALCHEMY_DATABASE_URI`: URL completa de conexión a la base de datos. Tiene
-     prioridad sobre el resto de variables.
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: parámetros
-     utilizados para construir la cadena de conexión MySQL cuando no se define
-     `SQLALCHEMY_DATABASE_URI`.
+## Pruebas y calidad
+- **Frontend**: ejecutar `npm test` dentro de `frontend/telcox-dashboard` para lanzar las pruebas unitarias base de Angular (Karma
+  + Jasmine).【F:frontend/telcox-dashboard/package.json†L6-L21】
+- **Backend**: actualmente no hay una suite automatizada; se recomienda añadir pruebas con Pytest cubriendo los servicios del BSS
+  y los controladores REST antes de desplegar en producción.
 
-- **frontend**
-  - `NG_CLI_ANALYTICS`: desactiva la telemetría del CLI de Angular.
+## Decisiones de diseño y librerías
+- **Capas separadas**: se optó por desacoplar backend y frontend para facilitar despliegues independientes y escalar cada servicio
+  según la carga esperada.
+- **Cliente BSS simulado**: el backend delega la lógica de negocio en `BSSClient`, lo que permite sustituir la implementación por
+  un conector real sin cambiar los endpoints REST.【F:backend/services/bss_client.py†L18-L74】
+- **PrimeNG**: se eligió PrimeNG como biblioteca principal de componentes para aprovechar tarjetas, tablas, formularios y toasts
+  responsivos con estilos consistentes.【F:frontend/telcox-dashboard/src/app/consumption/consumption.module.ts†L6-L13】
+- **Bootstrap**: Bootstrap se emplea como referencia para patrones de diseño responsivo y puede incorporarse fácilmente mediante su
+  hoja de estilos global si se necesitan utilidades adicionales; se prioriza mantener el bundle ligero y recurrir primero a las
+  capacidades de PrimeNG y CSS moderno.
+- **Gestión de errores centralizada**: se registran manejadores globales en Flask para transformar excepciones en respuestas JSON
+  uniformes.【F:backend/app_factory.py†L76-L89】
 
-Puedes modificar estas variables directamente en el archivo [`docker-compose.yml`](./docker-compose.yml) según tus necesidades.
+## Recursos adicionales
+- Configuración de variables de entorno en `docker-compose.yml` para ajustar puertos y credenciales.【F:docker-compose.yml†L1-L33】
+- Scripts de npm y Angular CLI documentados en `frontend/telcox-dashboard/README.md`.
