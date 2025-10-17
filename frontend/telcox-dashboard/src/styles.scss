@@ -1,0 +1,12 @@
+@use "sass:meta";
+
+@include meta.load-css("primeng/resources/themes/lara-light-blue/theme");
+@include meta.load-css("primeng/resources/primeng.min");
+@include meta.load-css("primeicons/primeicons");
+
+body {
+  margin: 0;
+  font-family: var(--font-family, "Roboto", sans-serif);
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+}
