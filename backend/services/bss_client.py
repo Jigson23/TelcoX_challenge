@@ -1,8 +1,8 @@
-"""Simulated BSS client services.
+"""Cliente BSS simulado.
 
-This module exposes a lightweight client that mimics the behaviour of a
-Business Support System (BSS). The client is used by the REST API layer to
-retrieve customer information such as balance, data consumption and minutes.
+Este módulo expone un cliente ligero que imita el comportamiento de un
+Business Support System (BSS). Se utiliza desde la capa REST para recuperar
+información de clientes como saldo, consumo y minutos.
 """
 from __future__ import annotations
 
@@ -12,20 +12,20 @@ from typing import Dict
 
 
 class BSSClientError(Exception):
-    """Base exception for BSS client errors."""
+    """Excepción base para errores del cliente BSS."""
 
 
 class BSSClientTimeout(BSSClientError, TimeoutError):
-    """Raised when the simulated backend takes too long to respond."""
+    """Se lanza cuando el backend simulado tarda demasiado en responder."""
 
 
 class BSSClient:
-    """In-memory simulation of a BSS client."""
+    """Simulación en memoria de un cliente BSS."""
 
     _DATA: Dict[str, Dict[str, object]] = {
-        "0001": {"name": "Ana Pérez", "balance": 15.5, "consumption_mb": 1024, "minutes": 120},
-        "0002": {"name": "Luis Gómez", "balance": 3.7, "consumption_mb": 5120, "minutes": 45},
-        "0003": {"name": "María López", "balance": 0.0, "consumption_mb": 256, "minutes": 300},
+        "0001": {"nombre": "Ana Pérez", "saldo": 15.5, "consumo_mb": 1024, "minutos": 120},
+        "0002": {"nombre": "Luis Gómez", "saldo": 3.7, "consumo_mb": 5120, "minutos": 45},
+        "0003": {"nombre": "María López", "saldo": 0.0, "consumo_mb": 256, "minutos": 300},
     }
 
     def __init__(self, timeout_probability: float = 0.0, latency_seconds: float = 0.0) -> None:
@@ -38,7 +38,7 @@ class BSSClient:
 
     def _maybe_timeout(self) -> None:
         if self.timeout_probability and random.random() < self.timeout_probability:
-            raise BSSClientTimeout("Simulated timeout reaching the BSS service")
+            raise BSSClientTimeout("Tiempo de espera agotado al consultar el servicio BSS")
 
     def _get_customer_record(self, customer_id: str) -> Dict[str, object]:
         self._maybe_timeout()
@@ -46,29 +46,29 @@ class BSSClient:
         try:
             return self._DATA[customer_id]
         except KeyError as exc:
-            raise BSSClientError(f"Customer '{customer_id}' not found") from exc
+            raise BSSClientError(f"No se encontró el cliente '{customer_id}'") from exc
 
     def get_consumption(self, customer_id: str) -> Dict[str, object]:
-        """Return the consumption summary for a customer."""
+        """Devuelve el resumen de consumo para un cliente."""
         record = self._get_customer_record(customer_id)
         return {
-            "customer_id": customer_id,
-            "consumption_mb": record["consumption_mb"],
-            "minutes": record["minutes"],
+            "cliente_id": customer_id,
+            "consumo_mb": record["consumo_mb"],
+            "minutos": record["minutos"],
         }
 
     def get_customer_profile(self, customer_id: str) -> Dict[str, object]:
-        """Return general information for a customer."""
+        """Devuelve la información general de un cliente."""
         record = self._get_customer_record(customer_id)
         return {
-            "customer_id": customer_id,
-            "name": record["name"],
-            "balance": record["balance"],
-            "consumption_mb": record["consumption_mb"],
-            "minutes": record["minutes"],
+            "cliente_id": customer_id,
+            "nombre": record["nombre"],
+            "saldo": record["saldo"],
+            "consumo_mb": record["consumo_mb"],
+            "minutos": record["minutos"],
         }
 
 
 def get_bss_client(timeout_probability: float = 0.0, latency_seconds: float = 0.0) -> BSSClient:
-    """Factory helper to create a BSS client instance."""
+    """Ayudante para crear una instancia del cliente BSS."""
     return BSSClient(timeout_probability=timeout_probability, latency_seconds=latency_seconds)

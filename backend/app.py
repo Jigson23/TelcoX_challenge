@@ -1,4 +1,4 @@
-"""Entry point for running the Flask application."""
+"""Punto de entrada para ejecutar la aplicación Flask."""
 from __future__ import annotations
 
 from backend.app_factory import create_app

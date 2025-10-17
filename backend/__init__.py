@@ -1,4 +1,4 @@
-"""Backend package for the TelcoX challenge."""
-from .app_factory import create_app
+"""Paquete backend para el reto TelcoX."""
+from .app_factory import create_app, configure_bss_client
 
-__all__ = ["create_app"]
+__all__ = ["create_app", "configure_bss_client"]
