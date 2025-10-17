@@ -2,12 +2,12 @@
 
 ## Descripción general
 La solución TelcoX ofrece un panel de control para consultar el consumo de datos y minutos de clientes de telecomunicaciones. El
-backend expone una API REST construida con Flask que simula la integración con un sistema BSS, mientras que el frontend se
+backend expone una API REST construida con Flask que se conecta a una base de datos relacional mediante SQLAlchemy, mientras que el frontend se
 implementa en Angular para visualizar la información en un dashboard interactivo.
 
 ## Arquitectura de la solución
-- **Backend (`/backend`)**: servicio Flask con SQLAlchemy y migraciones Alembic. Expone los endpoints REST y orquesta un cliente
-  BSS simulado que devuelve la información de consumo y perfil de cliente.【F:backend/routes/consumption.py†L1-L48】【F:backend/services/bss_client.py†L1-L74】
+- **Backend (`/backend`)**: servicio Flask con SQLAlchemy y migraciones Alembic. Expone los endpoints REST y utiliza servicios
+  de dominio para recuperar la información de consumo y perfil de cliente directamente desde la base de datos.【F:backend/routes/consumption.py†L1-L45】【F:backend/services/customer_service.py†L1-L104】
 - **Frontend (`/frontend/telcox-dashboard`)**: aplicación Angular 18 que consume la API y utiliza módulos PrimeNG para los
   componentes UI del panel (tablas, tarjetas, formularios y notificaciones).【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.html†L1-L64】
 - **Comunicación**: ambos servicios se orquestan vía `docker-compose` exponiendo el backend en el puerto 5000 y el frontend en el
@@ -60,6 +60,8 @@ implementa en Angular para visualizar la información en un dashboard interactiv
    FLASK_ENV=development python -m backend.app
    ```
 
+Al ejecutar `alembic upgrade head` se crean las tablas y se insertan tres clientes de ejemplo con consumos y facturación pendientes para poder probar la integración de extremo a extremo.【F:backend/migrations/versions/4c8d2df1a1a0_seed_initial_data.py†L1-L87】
+
 ### Frontend Angular en local
 1. Instalar dependencias:
    ```bash
@@ -75,8 +77,8 @@ implementa en Angular para visualizar la información en un dashboard interactiv
 ## Referencia de API
 | Endpoint | Método | Parámetros | Respuesta exitosa |
 | --- | --- | --- | --- |
-| `/api/consumo` | GET | `customer_id` (query string, obligatorio) | Resumen de consumo del cliente: `cliente_id`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L24-L37】【F:backend/services/bss_client.py†L50-L61】 |
-| `/api/cliente` | GET | `customer_id` (query string, obligatorio) | Perfil completo del cliente: `cliente_id`, `nombre`, `saldo`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L40-L52】【F:backend/services/bss_client.py†L63-L73】 |
+| `/api/consumo` | GET | `customer_id` (query string, obligatorio) | Resumen de consumo del cliente: `cliente_id`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L24-L37】【F:backend/services/customer_service.py†L44-L68】 |
+| `/api/cliente` | GET | `customer_id` (query string, obligatorio) | Perfil completo del cliente: `cliente_id`, `nombre`, `saldo`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L39-L45】【F:backend/services/customer_service.py†L71-L104】 |
 
 ### Estructura de datos
 Ejemplo de respuesta de `/api/cliente`:
@@ -93,9 +95,8 @@ El endpoint `/api/consumo` devuelve un subconjunto del mismo registro con los ca
 
 ### Manejo de errores
 - **400 Bad Request**: falta el parámetro `customer_id` o es inválido.【F:backend/routes/consumption.py†L32-L33】【F:backend/routes/consumption.py†L47-L48】
-- **404 Not Found**: el cliente no existe en el BSS simulado.【F:backend/routes/consumption.py†L36-L37】【F:backend/routes/consumption.py†L51-L52】
-- **504 Gateway Timeout**: el cliente BSS tardó más de lo permitido.【F:backend/routes/consumption.py†L34-L35】【F:backend/routes/consumption.py†L49-L50】
-- **500 Internal Server Error**: errores inesperados o falta de configuración del cliente BSS.【F:backend/routes/consumption.py†L30-L31】【F:backend/routes/consumption.py†L45-L46】【F:backend/app_factory.py†L60-L74】
+- **404 Not Found**: el cliente no existe en la base de datos.【F:backend/routes/consumption.py†L31-L37】【F:backend/routes/consumption.py†L40-L45】
+- **500 Internal Server Error**: errores inesperados al consultar la base de datos.【F:backend/routes/consumption.py†L28-L37】【F:backend/routes/consumption.py†L40-L45】【F:backend/app_factory.py†L50-L92】
 Todos los errores se devuelven en formato JSON con la clave `mensaje`.
 
 ## Pruebas y calidad
@@ -107,15 +108,14 @@ Todos los errores se devuelven en formato JSON con la clave `mensaje`.
      source .venv/bin/activate
      pip install -r requirements-dev.txt
      ```
-  2. Ejecutar la suite con `pytest`. Las pruebas cubren tanto el cliente BSS simulado como los endpoints `/api/consumo` y `/api/cliente`, incluyendo escenarios de error y timeouts.【F:backend/tests/test_bss_client.py†L1-L32】【F:backend/tests/test_consumption_endpoints.py†L1-L84】
+  2. Ejecutar la suite con `pytest`. Las pruebas cubren los servicios de dominio y los endpoints `/api/consumo` y `/api/cliente`, incluyendo escenarios de error de base de datos.【F:backend/tests/test_customer_service.py†L1-L74】【F:backend/tests/test_consumption_endpoints.py†L1-L60】
   3. En entornos containerizados es posible lanzar los tests con Docker: `docker compose run --rm backend sh -c "pip install -r requirements-dev.txt && pytest"`.
 - **Frontend (Karma + Jasmine)**: dentro de `frontend/telcox-dashboard` ejecutar `npm test -- --watch=false` para lanzar las pruebas unitarias de servicios y componentes. Se mockean las respuestas del backend y se validan estados de error del dashboard.【F:frontend/telcox-dashboard/src/app/consumption/services/consumption.service.spec.ts†L1-L94】【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.spec.ts†L1-L82】
 
 ## Decisiones de diseño y librerías
 - **Capas separadas**: se optó por desacoplar backend y frontend para facilitar despliegues independientes y escalar cada servicio
   según la carga esperada.
-- **Cliente BSS simulado**: el backend delega la lógica de negocio en `BSSClient`, lo que permite sustituir la implementación por
-  un conector real sin cambiar los endpoints REST.【F:backend/services/bss_client.py†L18-L74】
+- **Servicios de dominio sobre SQLAlchemy**: el backend encapsula las consultas de negocio en utilidades dedicadas que acceden a la base de datos mediante SQLAlchemy y devuelven DTOs listos para la capa REST.【F:backend/services/customer_service.py†L1-L104】
 - **PrimeNG**: se eligió PrimeNG como biblioteca principal de componentes para aprovechar tarjetas, tablas, formularios y toasts
   responsivos con estilos consistentes.【F:frontend/telcox-dashboard/src/app/consumption/consumption.module.ts†L6-L13】
 - **Bootstrap**: Bootstrap se emplea como referencia para patrones de diseño responsivo y puede incorporarse fácilmente mediante su

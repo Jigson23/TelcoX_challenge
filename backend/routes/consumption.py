@@ -1,21 +1,16 @@
 """Endpoints REST para consumo y datos de clientes."""
 from __future__ import annotations
 
-from typing import cast
-
 from flask import Blueprint, current_app, jsonify, request
 
-from backend.services.bss_client import BSSClient, BSSClientError, BSSClientTimeout
+from backend.services import (
+    CustomerNotFoundError,
+    CustomerServiceError,
+    get_consumption_summary,
+    get_customer_profile,
+)
 
 consumption_bp = Blueprint("consumption", __name__)
-
-
-def _obtener_cliente_bss() -> BSSClient:
-    cliente = current_app.config.get("BSS_CLIENT")
-    if cliente is None:
-        current_app.logger.error("No se encontró una instancia de BSS_CLIENT en la configuración")
-        raise RuntimeError("El cliente BSS no está configurado")
-    return cast(BSSClient, cliente)
 
 
 def _obtener_id_cliente() -> str:
@@ -30,32 +25,28 @@ def get_consumption() -> tuple:
     """Devuelve el consumo de datos y minutos del cliente indicado."""
     try:
         customer_id = _obtener_id_cliente()
-        bss_client = _obtener_cliente_bss()
-        payload = bss_client.get_consumption(customer_id)
+        payload = get_consumption_summary(customer_id)
         return jsonify(payload), 200
     except ValueError as error:
         return jsonify({"mensaje": str(error)}), 400
-    except RuntimeError as error:
-        return jsonify({"mensaje": str(error)}), 500
-    except BSSClientTimeout as error:
-        return jsonify({"mensaje": str(error)}), 504
-    except BSSClientError as error:
+    except CustomerNotFoundError as error:
         return jsonify({"mensaje": str(error)}), 404
+    except CustomerServiceError as error:
+        current_app.logger.exception("Error consultando consumo: %s", error)
+        return jsonify({"mensaje": "Error interno del servidor"}), 500
 
 
 @consumption_bp.route("/api/cliente", methods=["GET"])
-def get_customer_profile() -> tuple:
+def get_customer_profile_endpoint() -> tuple:
     """Devuelve la información general del cliente indicado."""
     try:
         customer_id = _obtener_id_cliente()
-        bss_client = _obtener_cliente_bss()
-        payload = bss_client.get_customer_profile(customer_id)
+        payload = get_customer_profile(customer_id)
         return jsonify(payload), 200
     except ValueError as error:
         return jsonify({"mensaje": str(error)}), 400
-    except RuntimeError as error:
-        return jsonify({"mensaje": str(error)}), 500
-    except BSSClientTimeout as error:
-        return jsonify({"mensaje": str(error)}), 504
-    except BSSClientError as error:
+    except CustomerNotFoundError as error:
         return jsonify({"mensaje": str(error)}), 404
+    except CustomerServiceError as error:
+        current_app.logger.exception("Error consultando datos de cliente: %s", error)
+        return jsonify({"mensaje": "Error interno del servidor"}), 500
