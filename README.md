@@ -99,10 +99,17 @@ El endpoint `/api/consumo` devuelve un subconjunto del mismo registro con los ca
 Todos los errores se devuelven en formato JSON con la clave `mensaje`.
 
 ## Pruebas y calidad
-- **Frontend**: ejecutar `npm test` dentro de `frontend/telcox-dashboard` para lanzar las pruebas unitarias base de Angular (Karma
-  + Jasmine).【F:frontend/telcox-dashboard/package.json†L6-L21】
-- **Backend**: actualmente no hay una suite automatizada; se recomienda añadir pruebas con Pytest cubriendo los servicios del BSS
-  y los controladores REST antes de desplegar en producción.
+- **Backend (Pytest)**:
+  1. Crear un entorno virtual en `backend/` e instalar las dependencias de desarrollo:
+     ```bash
+     cd backend
+     python -m venv .venv
+     source .venv/bin/activate
+     pip install -r requirements-dev.txt
+     ```
+  2. Ejecutar la suite con `pytest`. Las pruebas cubren tanto el cliente BSS simulado como los endpoints `/api/consumo` y `/api/cliente`, incluyendo escenarios de error y timeouts.【F:backend/tests/test_bss_client.py†L1-L32】【F:backend/tests/test_consumption_endpoints.py†L1-L84】
+  3. En entornos containerizados es posible lanzar los tests con Docker: `docker compose run --rm backend sh -c "pip install -r requirements-dev.txt && pytest"`.
+- **Frontend (Karma + Jasmine)**: dentro de `frontend/telcox-dashboard` ejecutar `npm test -- --watch=false` para lanzar las pruebas unitarias de servicios y componentes. Se mockean las respuestas del backend y se validan estados de error del dashboard.【F:frontend/telcox-dashboard/src/app/consumption/services/consumption.service.spec.ts†L1-L94】【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.spec.ts†L1-L82】
 
 ## Decisiones de diseño y librerías
 - **Capas separadas**: se optó por desacoplar backend y frontend para facilitar despliegues independientes y escalar cada servicio
