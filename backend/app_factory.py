@@ -10,7 +10,6 @@ from werkzeug.exceptions import HTTPException
 
 from backend.models import db
 from backend.routes.consumption import consumption_bp
-from backend.services.bss_client import get_bss_client
 
 
 DEFAULT_LOGGING_CONFIG: Dict[str, Any] = {
@@ -61,12 +60,6 @@ def configure_logging(config: Dict[str, Any] | None = None) -> None:
     dictConfig(logging_config)
 
 
-def configure_bss_client(app: Flask) -> None:
-    """Crea y almacena una instancia del cliente BSS en la aplicación."""
-    options = app.config.get("BSS_CLIENT_OPTIONS", {})
-    app.config["BSS_CLIENT"] = get_bss_client(**options)
-
-
 def create_app(config: Dict[str, Any] | None = None) -> Flask:
     """Crea y configura una instancia de la aplicación Flask."""
     app = Flask(__name__)
@@ -76,7 +69,6 @@ def create_app(config: Dict[str, Any] | None = None) -> Flask:
 
     configure_logging(app.config.get("LOGGING_CONFIG"))
     configure_database(app)
-    configure_bss_client(app)
 
     register_blueprints(app)
     register_error_handlers(app)
@@ -102,4 +94,4 @@ def register_error_handlers(app: Flask) -> None:
         return jsonify(response), 500
 
 
-__all__ = ["create_app", "configure_logging", "configure_database", "configure_bss_client"]
+__all__ = ["create_app", "configure_logging", "configure_database"]
