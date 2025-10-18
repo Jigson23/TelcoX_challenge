@@ -112,6 +112,28 @@ Todos los errores se devuelven en formato JSON con la clave `mensaje`.
   3. En entornos containerizados es posible lanzar los tests con Docker: `docker compose run --rm backend sh -c "pip install -r requirements-dev.txt && pytest"`.
 - **Frontend (Karma + Jasmine)**: dentro de `frontend/telcox-dashboard` ejecutar `npm test -- --watch=false` para lanzar las pruebas unitarias de servicios y componentes. Se mockean las respuestas del backend y se validan estados de error del dashboard.【F:frontend/telcox-dashboard/src/app/consumption/services/consumption.service.spec.ts†L1-L94】【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.spec.ts†L1-L82】
 
+### Firma automática de desarrollador
+
+Se incluye el script `scripts/add_signature.py` para añadir de forma automática la firma de Jigson Contreras (`supercontreras-ji@hotmail.com`) en los archivos compatibles del repositorio.
+
+Uso básico:
+
+```bash
+python scripts/add_signature.py
+```
+
+Para conocer cuántos archivos se modificarían sin aplicar cambios, ejecutar en modo simulación:
+
+```bash
+python scripts/add_signature.py --dry-run
+```
+
+El script acepta personalizaciones del nombre, correo y extensiones a procesar. Por ejemplo, para limitarse a archivos Python y JavaScript con un nombre distinto:
+
+```bash
+python scripts/add_signature.py --name "Otro Nombre" --email "correo@example.com" --extensions .py .js
+```
+
 ## Decisiones de diseño y librerías
 - **Capas separadas**: se optó por desacoplar backend y frontend para facilitar despliegues independientes y escalar cada servicio
   según la carga esperada.
