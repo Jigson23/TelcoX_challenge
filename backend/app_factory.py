@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 import os
+import socket
 from logging.config import dictConfig
 from typing import Any, Dict
+
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
 
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
@@ -33,6 +37,28 @@ DEFAULT_LOGGING_CONFIG: Dict[str, Any] = {
 }
 
 
+def _can_connect(host: str, port: int, timeout: float = 1.0) -> bool:
+    """Return True if a TCP connection to the host can be established."""
+
+    try:
+        with socket.create_connection((host, port), timeout):
+            return True
+    except OSError:
+        return False
+
+
+def _is_fallback_enabled(app: Flask) -> bool:
+    """Determine whether the automatic fallback to SQLite is allowed."""
+
+    env_override = app.config.get("DB_FALLBACK_ENABLED")
+    if env_override is None:
+        raw_value = os.getenv("DB_FALLBACK_ENABLED")
+        if raw_value is None:
+            return app.config.get("FLASK_ENV") != "production"
+        return raw_value.lower() not in {"0", "false", "no"}
+    return bool(env_override)
+
+
 def configure_database(app: Flask) -> None:
     """Configura la conexión a la base de datos y registra SQLAlchemy."""
 
@@ -49,6 +75,24 @@ def configure_database(app: Flask) -> None:
             uri = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
         else:
             uri = app.config.get("DEFAULT_SQLALCHEMY_DATABASE_URI", "sqlite:///telcox.db")
+    fallback_uri = app.config.get("DEFAULT_SQLALCHEMY_DATABASE_URI", "sqlite:///telcox.db")
+
+    try:
+        url = make_url(uri)
+    except ArgumentError:
+        url = None
+
+    if url and url.host and url.get_backend_name() in {"mysql"}:
+        port = int(url.port or 3306)
+        if _is_fallback_enabled(app) and not _can_connect(url.host, port):
+            app.logger.warning(
+                "No se pudo conectar a %s:%s. Se usará la base de datos SQLite de respaldo en %s.",
+                url.host,
+                port,
+                fallback_uri,
+            )
+            uri = fallback_uri
+
     app.config["SQLALCHEMY_DATABASE_URI"] = uri
 
     db.init_app(app)
