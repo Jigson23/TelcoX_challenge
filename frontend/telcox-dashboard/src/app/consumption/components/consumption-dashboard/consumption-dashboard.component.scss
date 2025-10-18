@@ -1,25 +1,25 @@
 :host {
   display: block;
-  padding: clamp(2rem, 5vw, 4rem) 1.5rem 3rem;
+  padding: clamp(1.25rem, 3vw, 2rem) 1rem 2rem;
 }
 
 .dashboard {
-  width: min(1040px, 100%);
+  width: min(960px, 100%);
   margin: 0 auto;
-  padding: clamp(1.75rem, 4vw, 2.75rem);
-  border-radius: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.25rem;
   background: #fffffff3;
-  box-shadow: 0 24px 44px -36px #0f172a61;
+  box-shadow: 0 16px 32px -28px #0f172a61;
   border: 1px solid #94a3b838;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: clamp(1.1rem, 2.5vw, 1.5rem);
 }
 
 .dashboard__header {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 
   @media (min-width: 700px) {
     flex-direction: row;
@@ -31,48 +31,48 @@
 .dashboard__title-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
 .dashboard__title {
   margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
   font-weight: 700;
   color: #1d4ed8;
 }
 
 .dashboard__subtitle {
   margin: 0;
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   color: #0f172ab3;
-  max-width: 32rem;
+  max-width: 28rem;
 }
 
 .dashboard__form {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: 0.65rem;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.75rem;
   border-radius: 999px;
-  background: linear-gradient(120deg, #2563eb1a, transparent);
-  border: 1px solid #2563eb40;
+  background: linear-gradient(120deg, #2563eb14, transparent);
+  border: 1px solid #2563eb33;
 }
 
 .dashboard__input {
-  width: clamp(12rem, 18vw, 14rem);
+  width: clamp(11rem, 16vw, 13rem);
 }
 
 .dashboard__input input {
   border-radius: 999px !important;
-  padding-inline: 2.75rem 1rem !important;
-  height: 2.75rem;
+  padding-inline: 2.4rem 1rem !important;
+  height: 2.45rem;
   border: 1px solid transparent;
   box-shadow: none;
 
   &:focus {
     border-color: #2563eb66;
-    box-shadow: 0 0 0 3px #2563eb2e;
+    box-shadow: 0 0 0 2px #2563eb24;
   }
 }
 
@@ -82,7 +82,7 @@
 
 .dashboard__search-button {
   border-radius: 999px;
-  padding-inline: 1.5rem;
+  padding-inline: 1.25rem;
   background: #2563eb;
   border: 1px solid #2563eb;
 
@@ -94,19 +94,19 @@
 
 .dashboard__card,
 .dashboard__table-card {
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   box-shadow: none;
   overflow: hidden;
 }
 
 :host ::ng-deep .dashboard__card .p-card-header,
 :host ::ng-deep .dashboard__table-card .p-card-header {
-  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(1rem, 2.4vw, 1.5rem) clamp(1.1rem, 2.4vw, 1.75rem);
 }
 
 :host ::ng-deep .dashboard__card .p-card-body,
 :host ::ng-deep .dashboard__table-card .p-card-body {
-  padding: clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
 }
 
 .dashboard__card-header {
@@ -151,16 +151,16 @@
 
 .dashboard__summary {
   display: grid;
-  gap: clamp(1.25rem, 2.5vw, 1.75rem);
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: clamp(0.9rem, 2vw, 1.2rem);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .dashboard__summary-item {
   display: flex;
-  gap: 0.9rem;
-  padding: clamp(1.5rem, 3vw, 2rem);
-  border-radius: 1.1rem;
-  border: 1px solid #94a3b838;
+  gap: 0.75rem;
+  padding: clamp(1.1rem, 2.5vw, 1.5rem);
+  border-radius: 0.95rem;
+  border: 1px solid #94a3b828;
   background: #f8fafc;
 
   &--balance {
@@ -193,10 +193,10 @@
 .summary-icon {
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.6rem;
+  height: 2.6rem;
   border-radius: 50%;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   background: #2563eb29;
   color: #1d4ed8;
 }
@@ -209,20 +209,20 @@
 
 
 .summary-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1e293b99;
 }
 
 .summary-value {
-  font-size: clamp(1.55rem, 3vw, 2rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
   font-weight: 700;
   color: #0f172af2;
 }
 
 .summary-helper {
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   color: #1e293b8c;
 }
 
@@ -232,8 +232,18 @@
 
 .dashboard__empty {
   text-align: center;
-  padding: 1.5rem;
+  padding: 1.1rem;
   color: #64748be6;
+}
+
+:host ::ng-deep .dashboard__table .p-datatable-thead > tr > th,
+:host ::ng-deep .dashboard__table .p-datatable-tbody > tr > td {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+:host ::ng-deep .dashboard__table .p-datatable-tbody > tr > td:nth-child(2) {
+  white-space: nowrap;
 }
 
 .dashboard__spinner {
