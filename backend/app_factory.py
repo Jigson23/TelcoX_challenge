@@ -10,6 +10,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
 from backend.models import db
@@ -113,6 +114,7 @@ def create_app(config: Dict[str, Any] | None = None) -> Flask:
 
     configure_logging(app.config.get("LOGGING_CONFIG"))
     configure_database(app)
+    configure_cors(app)
 
     register_blueprints(app)
     register_error_handlers(app)
@@ -138,4 +140,20 @@ def register_error_handlers(app: Flask) -> None:
         return jsonify(response), 500
 
 
-__all__ = ["create_app", "configure_logging", "configure_database"]
+def configure_cors(app: Flask) -> None:
+    """Configura CORS para permitir el acceso desde el frontend."""
+
+    origins = app.config.get("CORS_ORIGINS") or os.getenv("CORS_ORIGINS")
+    if origins:
+        allowed_origins = [origin.strip() for origin in origins.split(",") if origin.strip()]
+    else:
+        allowed_origins = ["*"]
+
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": allowed_origins}},
+        supports_credentials=True,
+    )
+
+
+__all__ = ["create_app", "configure_logging", "configure_database", "configure_cors"]
