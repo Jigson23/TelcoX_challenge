@@ -73,20 +73,21 @@ export class ConsumptionDashboardComponent implements OnInit {
     return [
       {
         metric: 'Saldo disponible',
-        value: new Intl.NumberFormat('es-PE', {
+        value: new Intl.NumberFormat('es-EC', {
           style: 'currency',
-          currency: 'PEN'
+          currency: 'USD',
+          currencyDisplay: 'narrowSymbol'
         }).format(data.profile.saldo),
         description: 'Crédito actual en la cuenta.'
       },
       {
         metric: 'Datos consumidos',
-        value: `${data.consumption.consumo_mb.toLocaleString('es-PE')} MB`,
+        value: `${data.consumption.consumo_mb.toLocaleString('es-EC')} MB`,
         description: 'Total de megabytes utilizados en el periodo.'
       },
       {
         metric: 'Minutos utilizados',
-        value: data.consumption.minutos.toLocaleString('es-PE'),
+        value: data.consumption.minutos.toLocaleString('es-EC'),
         description: 'Tiempo total de llamadas registradas.'
       }
     ];

@@ -49,7 +49,7 @@
         <div class="summary-content">
           <span class="summary-label">Saldo</span>
           <span class="summary-value">
-            {{ dashboard.profile.saldo | currency: 'PEN':'symbol':'1.2-2':'es-PE' }}
+            {{ dashboard.profile.saldo | currency: 'USD':'symbol-narrow':'1.2-2':'es-EC' }}
           </span>
           <span class="summary-helper">Disponible en tu cuenta</span>
         </div>
@@ -61,7 +61,7 @@
         </div>
         <div class="summary-content">
           <span class="summary-label">Datos</span>
-          <span class="summary-value">{{ dashboard.profile.consumo_mb | number: '1.0-0':'es-PE' }} MB</span>
+          <span class="summary-value">{{ dashboard.profile.consumo_mb | number: '1.0-0':'es-EC' }} MB</span>
           <span class="summary-helper">Consumo de megabytes</span>
         </div>
       </div>
@@ -72,7 +72,7 @@
         </div>
         <div class="summary-content">
           <span class="summary-label">Minutos</span>
-          <span class="summary-value">{{ dashboard.profile.minutos | number: '1.0-0':'es-PE' }}</span>
+          <span class="summary-value">{{ dashboard.profile.minutos | number: '1.0-0':'es-EC' }}</span>
           <span class="summary-helper">Tiempo hablado registrado</span>
         </div>
       </div>
