@@ -149,10 +149,14 @@ def configure_cors(app: Flask) -> None:
     else:
         allowed_origins = ["*"]
 
+    supports_credentials = app.config.get("CORS_SUPPORTS_CREDENTIALS")
+    if supports_credentials is None:
+        supports_credentials = allowed_origins != ["*"]
+
     CORS(
         app,
         resources={r"/api/*": {"origins": allowed_origins}},
-        supports_credentials=True,
+        supports_credentials=supports_credentials,
     )
 
 
