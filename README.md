@@ -11,7 +11,7 @@ implementa en Angular para visualizar la información en un dashboard interactiv
 - **Frontend (`/frontend/telcox-dashboard`)**: aplicación Angular 18 que consume la API y utiliza módulos PrimeNG para los
   componentes UI del panel (tablas, tarjetas, formularios y notificaciones).【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.html†L1-L64】
 - **Comunicación**: ambos servicios se orquestan vía `docker-compose` exponiendo el backend en el puerto 5000 y el frontend en el
-  4200. En local se puede ejecutar cada servicio de forma independiente o dentro de contenedores.【F:docker-compose.yml†L1-L33】
+  puerto configurable 4200. En local se puede ejecutar cada servicio de forma independiente o dentro de contenedores.【F:docker-compose.yml†L1-L33】
 
 ## Requisitos previos
 ### Desarrollo local
@@ -29,14 +29,18 @@ implementa en Angular para visualizar la información en un dashboard interactiv
    ```bash
    docker compose up --build -d
    ```
-2. Acceder a los servicios:
+2. (Opcional) Define una variable `FRONTEND_PORT` si el puerto 4200 está reservado en tu sistema (por ejemplo, en Windows puede aparecer el error `An attempt was made to access a socket in a way forbidden by its access permissions`). Puedes crear un archivo `.env` en la raíz con el siguiente contenido o exportar la variable en tu terminal antes de levantar los contenedores:
+   ```bash
+   FRONTEND_PORT=4300
+   ```
+3. Acceder a los servicios:
    - Backend Flask: http://localhost:5000
-   - Frontend Angular: http://localhost:4200
-3. Seguir los registros combinados:
+   - Frontend Angular: http://localhost:${FRONTEND_PORT:-4200}
+4. Seguir los registros combinados:
    ```bash
    docker compose logs -f
    ```
-4. Detener y limpiar los contenedores:
+5. Detener y limpiar los contenedores:
    ```bash
    docker compose down
    ```
