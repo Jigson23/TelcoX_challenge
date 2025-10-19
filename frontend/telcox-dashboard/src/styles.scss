@@ -1,0 +1,26 @@
+@use "sass:meta";
+
+@include meta.load-css("primeng/resources/themes/lara-light-blue/theme");
+@include meta.load-css("primeng/resources/primeng.min");
+@include meta.load-css("primeicons/primeicons");
+
+body {
+  margin: 0;
+  font-family: var(--font-family, "Roboto", sans-serif);
+  min-height: 100vh;
+  color: var(--text-color);
+  background:
+    radial-gradient(60% 80% at 15% 20%, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 60%),
+    radial-gradient(50% 70% at 85% 10%, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 60%),
+    radial-gradient(70% 90% at 80% 85%, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0) 70%),
+    linear-gradient(180deg, #f8fafc 0%, #ffffff 65%, #f1f5f9 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+app-root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
