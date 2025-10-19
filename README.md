@@ -79,3 +79,35 @@ Al ejecutar `alembic upgrade head` se crean las tablas y se insertan tres client
 | --- | --- | --- | --- |
 | `/api/consumo` | GET | `customer_id` (query string, obligatorio) | Resumen de consumo del cliente: `cliente_id`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L24-L37】【F:backend/services/customer_service.py†L44-L68】 |
 | `/api/cliente` | GET | `customer_id` (query string, obligatorio) | Perfil completo del cliente: `cliente_id`, `nombre`, `saldo`, `consumo_mb`, `minutos`.【F:backend/routes/consumption.py†L39-L45】【F:backend/services/customer_service.py†L71-L104】 |
+
+### Estructura de datos
+Ejemplo de respuesta de `/api/cliente`:
+```json
+{
+  "cliente_id": "0001",
+  "nombre": "Ana Pérez",
+  "saldo": 15.5,
+  "consumo_mb": 1024,
+  "minutos": 120
+}
+```
+El endpoint `/api/consumo` devuelve un subconjunto del mismo registro con los campos `cliente_id`, `consumo_mb` y `minutos`.
+
+### Manejo de errores
+- **400 Bad Request**: falta el parámetro `customer_id` o es inválido.【F:backend/routes/consumption.py†L32-L33】【F:backend/routes/consumption.py†L47-L48】
+- **404 Not Found**: el cliente no existe en la base de datos.【F:backend/routes/consumption.py†L31-L37】【F:backend/routes/consumption.py†L40-L45】
+- **500 Internal Server Error**: errores inesperados al consultar la base de datos.【F:backend/routes/consumption.py†L28-L37】【F:backend/routes/consumption.py†L40-L45】【F:backend/app_factory.py†L50-L92】
+Todos los errores se devuelven en formato JSON con la clave `mensaje`.
+
+## Pruebas y calidad
+- **Backend (Pytest)**:
+  1. Crear un entorno virtual en `backend/` e instalar las dependencias de desarrollo:
+     ```bash
+     cd backend
+     python -m venv .venv
+     source .venv/bin/activate
+     pip install -r requirements-dev.txt
+     ```
+  2. Ejecutar la suite con `pytest`. Las pruebas cubren los servicios de dominio y los endpoints `/api/consumo` y `/api/cliente`, incluyendo escenarios de error de base de datos.【F:backend/tests/test_customer_service.py†L1-L74】【F:backend/tests/test_consumption_endpoints.py†L1-L60】
+  3. En entornos containerizados es posible lanzar los tests con Docker: `docker compose run --rm backend sh -c "pip install -r requirements-dev.txt && pytest"`.
+- **Frontend (Karma + Jasmine)**: dentro de `frontend/telcox-dashboard` ejecutar `npm test -- --watch=false` para lanzar las pruebas unitarias de servicios y componentes. Se mockean las respuestas del backend y se validan estados de error del dashboard.【F:frontend/telcox-dashboard/src/app/consumption/services/consumption.service.spec.ts†L1-L94】【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.spec.ts†L1-L82】
