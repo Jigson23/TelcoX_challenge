@@ -153,4 +153,4 @@ python scripts/add_signature.py --name "Otro Nombre" --email "correo@example.com
 - Scripts de npm y Angular CLI documentados en `frontend/telcox-dashboard/README.md`.
 
 ## Capturas de pantalla
-![alt text](image.png)
+![alt text](image-1.png)
