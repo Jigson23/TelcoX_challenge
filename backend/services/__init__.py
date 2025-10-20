@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Paquete de servicios de dominio."""
 from __future__ import annotations
 

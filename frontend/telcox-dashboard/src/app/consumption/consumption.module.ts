@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';

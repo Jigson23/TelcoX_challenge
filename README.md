@@ -1,3 +1,5 @@
+<!-- Author: Ing. Jigson Contreras -->
+<!-- Email: supercontreras-ji@hotmail.com -->
 # TelcoX Challenge
 
 ## Descripción general
@@ -149,3 +151,6 @@ python scripts/add_signature.py --name "Otro Nombre" --email "correo@example.com
 ## Recursos adicionales
 - Configuración de variables de entorno en `docker-compose.yml` para ajustar puertos y credenciales.【F:docker-compose.yml†L1-L33】
 - Scripts de npm y Angular CLI documentados en `frontend/telcox-dashboard/README.md`.
+
+## Capturas de pantalla
+![alt text](image.png)

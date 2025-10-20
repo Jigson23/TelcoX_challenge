@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';

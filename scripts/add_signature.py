@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 #!/usr/bin/env python3
 """Utility to add developer signature headers to project files."""
 from __future__ import annotations

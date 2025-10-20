@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Modelos principales de clientes y facturación."""
 from __future__ import annotations
 

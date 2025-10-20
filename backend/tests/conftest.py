@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Fixtures de Pytest para la aplicación Flask."""
 from __future__ import annotations
 

@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Endpoints REST para consumo y datos de clientes."""
 from __future__ import annotations
 

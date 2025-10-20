@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { registerLocaleData } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
 import localeEs from '@angular/common/locales/es';

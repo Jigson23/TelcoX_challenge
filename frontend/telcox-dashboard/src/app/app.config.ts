@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';

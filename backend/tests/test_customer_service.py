@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Pruebas unitarias para los servicios de clientes."""
 from __future__ import annotations
 

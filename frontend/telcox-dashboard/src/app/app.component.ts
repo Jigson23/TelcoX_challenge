@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';

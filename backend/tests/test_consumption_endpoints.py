@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Pruebas de integración ligera para los endpoints de consumo."""
 from __future__ import annotations
 

@@ -1,3 +1,5 @@
+# Author: Ing. Jigson Contreras
+# Email: supercontreras-ji@hotmail.com
 """Inicialización de modelos y utilidad de base de datos."""
 from __future__ import annotations
 

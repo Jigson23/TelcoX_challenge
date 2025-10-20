@@ -1,3 +1,5 @@
+// Author: Ing. Jigson Contreras
+// Email: supercontreras-ji@hotmail.com
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
