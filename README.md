@@ -111,3 +111,41 @@ Todos los errores se devuelven en formato JSON con la clave `mensaje`.
   2. Ejecutar la suite con `pytest`. Las pruebas cubren los servicios de dominio y los endpoints `/api/consumo` y `/api/cliente`, incluyendo escenarios de error de base de datos.【F:backend/tests/test_customer_service.py†L1-L74】【F:backend/tests/test_consumption_endpoints.py†L1-L60】
   3. En entornos containerizados es posible lanzar los tests con Docker: `docker compose run --rm backend sh -c "pip install -r requirements-dev.txt && pytest"`.
 - **Frontend (Karma + Jasmine)**: dentro de `frontend/telcox-dashboard` ejecutar `npm test -- --watch=false` para lanzar las pruebas unitarias de servicios y componentes. Se mockean las respuestas del backend y se validan estados de error del dashboard.【F:frontend/telcox-dashboard/src/app/consumption/services/consumption.service.spec.ts†L1-L94】【F:frontend/telcox-dashboard/src/app/consumption/components/consumption-dashboard/consumption-dashboard.component.spec.ts†L1-L82】
+
+### Firma automática de desarrollador
+
+Se incluye el script `scripts/add_signature.py` para añadir de forma automática la firma de Jigson Contreras (`supercontreras-ji@hotmail.com`) en los archivos compatibles del repositorio.
+
+Uso básico:
+
+```bash
+python scripts/add_signature.py
+```
+
+Para conocer cuántos archivos se modificarían sin aplicar cambios, ejecutar en modo simulación:
+
+```bash
+python scripts/add_signature.py --dry-run
+```
+
+El script acepta personalizaciones del nombre, correo y extensiones a procesar. Por ejemplo, para limitarse a archivos Python y JavaScript con un nombre distinto:
+
+```bash
+python scripts/add_signature.py --name "Otro Nombre" --email "correo@example.com" --extensions .py .js
+```
+
+## Decisiones de diseño y librerías
+- **Capas separadas**: se optó por desacoplar backend y frontend para facilitar despliegues independientes y escalar cada servicio
+  según la carga esperada.
+- **Servicios de dominio sobre SQLAlchemy**: el backend encapsula las consultas de negocio en utilidades dedicadas que acceden a la base de datos mediante SQLAlchemy y devuelven DTOs listos para la capa REST.【F:backend/services/customer_service.py†L1-L104】
+- **PrimeNG**: se eligió PrimeNG como biblioteca principal de componentes para aprovechar tarjetas, tablas, formularios y toasts
+  responsivos con estilos consistentes.【F:frontend/telcox-dashboard/src/app/consumption/consumption.module.ts†L6-L13】
+- **Bootstrap**: Bootstrap se emplea como referencia para patrones de diseño responsivo y puede incorporarse fácilmente mediante su
+  hoja de estilos global si se necesitan utilidades adicionales; se prioriza mantener el bundle ligero y recurrir primero a las
+  capacidades de PrimeNG y CSS moderno.
+- **Gestión de errores centralizada**: se registran manejadores globales en Flask para transformar excepciones en respuestas JSON
+  uniformes.【F:backend/app_factory.py†L76-L89】
+
+## Recursos adicionales
+- Configuración de variables de entorno en `docker-compose.yml` para ajustar puertos y credenciales.【F:docker-compose.yml†L1-L33】
+- Scripts de npm y Angular CLI documentados en `frontend/telcox-dashboard/README.md`.
