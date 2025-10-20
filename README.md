@@ -154,3 +154,4 @@ python scripts/add_signature.py --name "Otro Nombre" --email "correo@example.com
 
 ## Capturas de pantalla
 ![alt text](image-1.png)
+![alt text](image.png)
